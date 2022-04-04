@@ -69,7 +69,7 @@ class Usercontroller {
         .json({ message: `room found`, room: roomInfo, success: true });
     } catch (e) {
       console.log(e);
-      return res.status(400).json(e, { message: e.message, success: false });
+      return res.status(400).json( { message: e.message, success: false });
     }
   };
 }
