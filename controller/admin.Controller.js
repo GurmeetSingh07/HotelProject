@@ -64,12 +64,12 @@ class Admincontroller {
       if (roomUrl.length <= 0) {
         return res
           .status(206)
-          .json({ message: "fill the field", success: true });
+          .json({ message: "fill the field", success: false });
       }
       if (!roomId || !roomtype || !price) {
         return res
           .status(206)
-          .json({ message: "fill the field", success: true });
+          .json({ message: "fill the field", success: false });
       }
 
       const roomIdexits = await roomModel.findOne({
@@ -78,7 +78,7 @@ class Admincontroller {
       if (roomIdexits) {
         return res
           .status(400)
-          .json({ message: "roomId Already Exist", success: true });
+          .json({ message: "roomId Already Exist", success: false });
       } else {
         const addingRoom = new roomModel({
           roomId: roomId,
@@ -113,24 +113,17 @@ class Admincontroller {
       return res.status(500).json({ message: e.message, success: false });
     }
   };
-
   roomViewSingle = async (req, res) => {
     try {
-      const id = req.params.id;
-      console.log(id);
-      const getDate = await roomModel.findOne({ _id: id });
-      if (!getDate)
-        return res
-          .status(404)
-          .json({ message: `No room found`, success: false });
-      return res.status(200).json({
-        message: "room view successfully",
-        success: true,
-        room: getDate,
-      });
+      
+      const roomInfo = await roomModel.findOne({_id:req?.params?.id});
+      if(!roomInfo) return res.status(400).json({success:false,message:"room Not Found"})
+      else return res
+        .status(200)
+        .json({ message: `room found`, room: roomInfo, success: true });
     } catch (e) {
       console.log(e);
-      return res.status(500).json({ message: e.message, success: false });
+      return res.status(400).json(e, { message: e.message, success: false });
     }
   };
 
@@ -192,21 +185,17 @@ class Admincontroller {
       if (!roomId) {
         return res
           .status(206)
-          .json({ message: "fill the field", success: true });
+          .json({ message: "fill the field", success: false });
       }
       const roomExist = await roomModel.findOne({ roomId: roomId });
 
       if (!roomExist) {
         return res
           .status(404)
-          .json({ message: "roomId not found", success: true });
+          .json({ message: "roomId not found", success: false });
       } else {
         const id = roomExist._id;
-        const roomFind = await roomModel.findByIdAndDelete(
-          { _id: id },
-          { roomId: roomId },
-          { new: true }
-        );
+        const roomDeletes=await roomModel.findByIdAndDelete({_id:id},{new:true});
         return res
           .status(200)
           .json({ message: "room delete successfully", success: true });
